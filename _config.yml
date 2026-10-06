@@ -1,0 +1,6 @@
+title: Nire web horria
+theme: minima
+
+header_pages:
+  - index.md
+  - gallery.md
