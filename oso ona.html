@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="es" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Portfolio | Cyberpunk Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            cyan: '#00f3ff',
+                            purple: '#b000ff',
+                            pink: '#ff0055',
+                            green: '#00ff66',
+                            dark: '#0a0d14',
+                            card: 'rgba(16, 22, 34, 0.75)'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['Fira Code', 'JetBrains Mono', 'Courier New', 'monospace'],
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 2s infinite alternate',
+                        'float': 'float 4s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%': { boxShadow: '0 0 15px rgba(0,243,255,0.2)' },
+                            '100%': { boxShadow: '0 0 30px rgba(0,243,255,0.6)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&family=Inter:wght@300;400;600;800;900&display=swap');
+
+        :root {
+            --accent-color: #00f3ff;
+            --accent-glow: rgba(0, 243, 255, 0.4);
+        }
+
+        body {
+            background-color: #06090e;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .accent-text { color: var(--accent-color); }
+        .accent-bg { background-color: var(--accent-color); }
+        .accent-border { border-color: var(--accent-color); }
+        .accent-glow { box-shadow: 0 0 20px var(--accent-glow); }
+
+        /* Custom Glassmorphism */
+        .glass-panel {
+            background: rgba(13, 18, 30, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-panel:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-glow);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #06090e; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+
+        /* Scanline overlay effect */
+        .scanline-bg::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        /* Glitch Effect */
+        .glitch-wrapper { position: relative; }
+        .glitch-text::before, .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            clip: rect(0, 0, 0, 0);
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-slate-200 antialiased selection:bg-cyan-500 selection:text-black">
+
+    <!-- Interactive Canvas Particles Background -->
+    <canvas id="bg-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 left-0 w-full z-50 glass-panel border-b border-slate-800/80 px-6 py-4 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#hero" class="flex items-center gap-2 text-xl font-black tracking-wider group">
+                <span class="text-2xl accent-text">&lt;/&gt;</span>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400 group-hover:from-cyan-400 group-hover:to-purple-500 transition-all">
+                    DEV.PORTFOLIO
+                </span>
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center space-x-8 font-mono text-sm">
+                <a href="#about" class="hover:text-cyan-400 transition-colors flex items-center gap-1"><span class="accent-text">01.</span> Sobre Mí</a>
+                <a href="#projects" class="hover:text-cyan-400 transition-colors flex items-center gap-1"><span class="accent-text">02.</span> Proyectos</a>
+                <a href="#skills" class="hover:text-cyan-400 transition-colors flex items-center gap-1"><span class="accent-text">03.</span> Skills</a>
+                <a href="#terminal" class="hover:text-cyan-400 transition-colors flex items-center gap-1"><span class="accent-text">04.</span> Terminal</a>
+                <a href="#contact" class="hover:text-cyan-400 transition-colors flex items-center gap-1"><span class="accent-text">05.</span> Contacto</a>
+            </div>
+
+            <!-- Custom Accent Color Picker Controls -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5 glass-panel p-1.5 rounded-full border border-slate-700/60">
+                    <button onclick="setTheme('#00f3ff')" class="w-4 h-4 rounded-full bg-cyan-400 hover:scale-125 transition-transform" title="Cyan Neon"></button>
+                    <button onclick="setTheme('#00ff66')" class="w-4 h-4 rounded-full bg-emerald-400 hover:scale-125 transition-transform" title="Matrix Green"></button>
+                    <button onclick="setTheme('#b000ff')" class="w-4 h-4 rounded-full bg-purple-500 hover:scale-125 transition-transform" title="Cyber Purple"></button>
+                    <button onclick="setTheme('#ff0055')" class="w-4 h-4 rounded-full bg-rose-500 hover:scale-125 transition-transform" title="Neon Pink"></button>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-slate-300 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden pt-4 pb-2 border-t border-slate-800 mt-3 font-mono text-sm space-y-3">
+            <a href="#about" class="block py-1 hover:text-cyan-400 transition-colors"><span class="accent-text">01.</span> Sobre Mí</a>
+            <a href="#projects" class="block py-1 hover:text-cyan-400 transition-colors"><span class="accent-text">02.</span> Proyectos</a>
+            <a href="#skills" class="block py-1 hover:text-cyan-400 transition-colors"><span class="accent-text">03.</span> Skills</a>
+            <a href="#terminal" class="block py-1 hover:text-cyan-400 transition-colors"><span class="accent-text">04.</span> Terminal</a>
+            <a href="#contact" class="block py-1 hover:text-cyan-400 transition-colors"><span class="accent-text">05.</span> Contacto</a>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="relative z-10 max-w-7xl mx-auto px-6 pt-28 space-y-32">
+
+        <!-- Hero Section -->
+        <section id="hero" class="min-h-[85vh] flex flex-col justify-center items-start pt-10">
+            <div class="glass-panel p-3 px-4 rounded-full text-xs font-mono accent-text border border-cyan-500/30 mb-6 flex items-center gap-2 animate-pulse">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Disponible para proyectos & colaboraciones
+            </div>
+
+            <h1 class="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight mb-4">
+                CREANDO EL <br/>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500">
+                    FUTURO DIGITAL
+                </span>
+            </h1>
+
+            <div class="text-xl sm:text-2xl text-slate-400 font-mono mb-8 h-10 flex items-center">
+                <span>&gt; Soy&nbsp;</span>
+                <span id="typewriter" class="accent-text font-bold border-r-2 border-cyan-400 pr-1 animate-pulse"></span>
+            </div>
+
+            <p class="max-w-2xl text-slate-400 text-lg mb-10 leading-relaxed">
+                Desarrollador Full-Stack apasionado por crear aplicaciones web interactivas de alto rendimiento, experiencias 3D/canvas e interfaces vanguardistas.
+            </p>
+
+            <div class="flex flex-wrap gap-4 font-mono">
+                <a href="#projects" class="px-8 py-4 rounded-xl accent-bg text-black font-bold hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/30 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-rocket"></i> Ver Proyectos
+                </a>
+                <a href="#terminal" class="px-8 py-4 rounded-xl glass-panel border border-slate-700 hover:border-cyan-400 hover:text-cyan-400 transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-terminal"></i> Abrir Terminal
+                </a>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="scroll-mt-28">
+            <div class="flex items-center gap-4 mb-10">
+                <h2 class="text-3xl font-extrabold tracking-wide"><span class="accent-text font-mono">01.</span> Sobre Mí</h2>
+                <div class="h-[1px] bg-slate-800 flex-1"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="md:col-span-2 glass-panel p-8 rounded-2xl space-y-4">
+                    <p class="text-slate-300 leading-relaxed text-lg">
+                        ¡Hola! Me apasiona construir software eficiente, elegante e intuitivo. Mi aventura en el desarrollo web comenzó experimentando con diseño interactivo, y desde entonces no he parado de aprender nuevas tecnologías.
+                    </p>
+                    <p class="text-slate-400 leading-relaxed">
+                        Actualmente me enfoco en crear aplicaciones web modernas utilizando ecosistemas tipo React, Node.js, TypeScript y TailwindCSS, combinándolos con efectos de gráficos vectoriales y animaciones avanzadas en Canvas/WebGL.
+                    </p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 font-mono text-sm">
+                        <div class="flex items-center gap-2 text-slate-300"><i class="fa-solid fa-check text-cyan-400"></i> Full-Stack Dev</div>
+                        <div class="flex items-center gap-2 text-slate-300"><i class="fa-solid fa-check text-cyan-400"></i> UI/UX Design</div>
+                        <div class="flex items-center gap-2 text-slate-300"><i class="fa-solid fa-check text-cyan-400"></i> Open Source</div>
+                        <div class="flex items-center gap-2 text-slate-300"><i class="fa-solid fa-check text-cyan-400"></i> Web3 & APIs</div>
+                        <div class="flex items-center gap-2 text-slate-300"><i class="fa-solid fa-check text-cyan-400"></i> Game Dev Canvas</div>
+                        <div class="flex items-center gap-2 text-slate-300"><i class="fa-solid fa-check text-cyan-400"></i> CI/CD DevOps</div>
+                    </div>
+                </div>
+
+                <!-- Stats card -->
+                <div class="glass-panel p-8 rounded-2xl flex flex-col justify-between space-y-6">
+                    <div class="border-b border-slate-800 pb-4">
+                        <div class="text-4xl font-black accent-text">3+</div>
+                        <div class="text-slate-400 text-sm font-mono mt-1">Años de Experiencia</div>
+                    </div>
+                    <div class="border-b border-slate-800 pb-4">
+                        <div class="text-4xl font-black text-purple-400">25+</div>
+                        <div class="text-slate-400 text-sm font-mono mt-1">Proyectos Completados</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-black text-emerald-400">100%</div>
+                        <div class="text-slate-400 text-sm font-mono mt-1">Pasión por el Código</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Showcase Section -->
+        <section id="projects" class="scroll-mt-28">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+                <div class="flex items-center gap-4 flex-1">
+                    <h2 class="text-3xl font-extrabold tracking-wide"><span class="accent-text font-mono">02.</span> Proyectos</h2>
+                    <div class="h-[1px] bg-slate-800 flex-1"></div>
+                </div>
+
+                <!-- Filter Controls -->
+                <div class="flex gap-2 font-mono text-xs overflow-x-auto pb-2 md:pb-0">
+                    <button onclick="filterProjects('all')" class="proj-filter active px-4 py-2 rounded-lg glass-panel border border-cyan-400 text-cyan-400">Todos</button>
+                    <button onclick="filterProjects('web')" class="proj-filter px-4 py-2 rounded-lg glass-panel hover:text-cyan-400">Web App</button>
+                    <button onclick="filterProjects('game')" class="proj-filter px-4 py-2 rounded-lg glass-panel hover:text-cyan-400">Juegos</button>
+                    <button onclick="filterProjects('tools')" class="proj-filter px-4 py-2 rounded-lg glass-panel hover:text-cyan-400">Herramientas</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projects-grid">
+                <!-- Project 1 -->
+                <div class="project-card glass-panel rounded-2xl overflow-hidden group transition-all duration-300" data-category="web">
+                    <div class="relative h-48 bg-slate-900 overflow-hidden flex items-center justify-center">
+                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-purple-600/20 group-hover:scale-110 transition-transform duration-500"></div>
+                        <i class="fa-solid fa-layer-group text-6xl text-slate-700 group-hover:text-cyan-400 transition-colors"></i>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold group-hover:text-cyan-400 transition-colors">Cyber Dashboard</h3>
+                            <div class="flex gap-3 text-slate-400">
+                                <a href="#" class="hover:text-white"><i class="fa-brands fa-github text-lg"></i></a>
+                                <a href="#" class="hover:text-white"><i class="fa-solid fa-arrow-up-right-from-square text-lg"></i></a>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 text-sm">Panel de analíticas en tiempo real con widgets personalizables, gráficos dinámicos y tema neón.</p>
+                        <div class="flex flex-wrap gap-2 font-mono text-xs text-cyan-300">
+                            <span class="px-2 py-1 rounded bg-cyan-950/60 border border-cyan-800">React</span>
+                            <span class="px-2 py-1 rounded bg-cyan-950/60 border border-cyan-800">Tailwind</span>
+                            <span class="px-2 py-1 rounded bg-cyan-950/60 border border-cyan-800">Chart.js</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card glass-panel rounded-2xl overflow-hidden group transition-all duration-300" data-category="game">
+                    <div class="relative h-48 bg-slate-900 overflow-hidden flex items-center justify-center">
+                        <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-cyan-600/20 group-hover:scale-110 transition-transform duration-500"></div>
+                        <i class="fa-solid fa-gamepad text-6xl text-slate-700 group-hover:text-emerald-400 transition-colors"></i>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold group-hover:text-emerald-400 transition-colors">Retro Canvas Shooter</h3>
+                            <div class="flex gap-3 text-slate-400">
+                                <a href="#" class="hover:text-white"><i class="fa-brands fa-github text-lg"></i></a>
+                                <a href="#" class="hover:text-white"><i class="fa-solid fa-arrow-up-right-from-square text-lg"></i></a>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 text-sm">Juego de naves espacial estilo arcade 2D desarrollado enteramente en HTML5 Canvas y JS Vanilla.</p>
+                        <div class="flex flex-wrap gap-2 font-mono text-xs text-emerald-300">
+                            <span class="px-2 py-1 rounded bg-emerald-950/60 border border-emerald-800">JavaScript</span>
+                            <span class="px-2 py-1 rounded bg-emerald-950/60 border border-emerald-800">HTML5 Canvas</span>
+                            <span class="px-2 py-1 rounded bg-emerald-950/60 border border-emerald-800">Web Audio API</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card glass-panel rounded-2xl overflow-hidden group transition-all duration-300" data-category="tools">
+                    <div class="relative h-48 bg-slate-900 overflow-hidden flex items-center justify-center">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-600/20 group-hover:scale-110 transition-transform duration-500"></div>
+                        <i class="fa-solid fa-terminal text-6xl text-slate-700 group-hover:text-purple-400 transition-colors"></i>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold group-hover:text-purple-400 transition-colors">CLI Developer Tool</h3>
+                            <div class="flex gap-3 text-slate-400">
+                                <a href="#" class="hover:text-white"><i class="fa-brands fa-github text-lg"></i></a>
+                                <a href="#" class="hover:text-white"><i class="fa-solid fa-arrow-up-right-from-square text-lg"></i></a>
+                            </div>
+                        </div>
+                        <p class="text-slate-400 text-sm">Herramienta de consola para automatizar despliegues, formateo de código y gestión de proyectos.</p>
+                        <div class="flex flex-wrap gap-2 font-mono text-xs text-purple-300">
+                            <span class="px-2 py-1 rounded bg-purple-950/60 border border-purple-800">Node.js</span>
+                            <span class="px-2 py-1 rounded bg-purple-950/60 border border-purple-800">TypeScript</span>
+                            <span class="px-2 py-1 rounded bg-purple-950/60 border border-purple-800">NPM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="scroll-mt-28">
+            <div class="flex items-center gap-4 mb-10">
+                <h2 class="text-3xl font-extrabold tracking-wide"><span class="accent-text font-mono">03.</span> Habilidades</h2>
+                <div class="h-[1px] bg-slate-800 flex-1"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Frontend Skill Meters -->
+                <div class="glass-panel p-8 rounded-2xl space-y-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-code text-cyan-400"></i> Frontend & UI
+                    </h3>
+
+                    <div class="space-y-4 font-mono text-sm">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>JavaScript / TypeScript</span>
+                                <span class="accent-text">95%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="accent-bg h-full rounded-full transition-all duration-1000" style="width: 95%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>React & Next.js</span>
+                                <span class="accent-text">90%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="accent-bg h-full rounded-full transition-all duration-1000" style="width: 90%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>Tailwind CSS & Styling</span>
+                                <span class="accent-text">98%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="accent-bg h-full rounded-full transition-all duration-1000" style="width: 98%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Backend & Tools Skill Meters -->
+                <div class="glass-panel p-8 rounded-2xl space-y-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-server text-purple-400"></i> Backend & DevOps
+                    </h3>
+
+                    <div class="space-y-4 font-mono text-sm">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>Node.js & Express</span>
+                                <span class="text-purple-400">88%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-purple-500 h-full rounded-full transition-all duration-1000" style="width: 88%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>Git & GitHub Pages</span>
+                                <span class="text-purple-400">92%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-purple-500 h-full rounded-full transition-all duration-1000" style="width: 92%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span>Bases de Datos (SQL/MongoDB)</span>
+                                <span class="text-purple-400">82%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-purple-500 h-full rounded-full transition-all duration-1000" style="width: 82%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Terminal Console -->
+        <section id="terminal" class="scroll-mt-28">
+            <div class="flex items-center gap-4 mb-10">
+                <h2 class="text-3xl font-extrabold tracking-wide"><span class="accent-text font-mono">04.</span> Interactive Terminal</h2>
+                <div class="h-[1px] bg-slate-800 flex-1"></div>
+            </div>
+
+            <div class="glass-panel rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl font-mono">
+                <!-- Terminal Header Bar -->
+                <div class="bg-slate-900/90 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-rose-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        <span class="text-xs text-slate-400 ml-2">guest@github-pages:~</span>
+                    </div>
+                    <span class="text-xs text-slate-500">bash 5.2</span>
+                </div>
+
+                <!-- Terminal Output & Input Area -->
+                <div class="p-6 h-80 overflow-y-auto space-y-3 text-sm" id="terminal-body">
+                    <div class="text-slate-400">¡Bienvenido a la consola interactiva! Escribe <span class="accent-text font-bold">'help'</span> para ver la lista de comandos disponibles.</div>
+                </div>
+
+                <!-- Terminal Input Form -->
+                <form id="terminal-form" class="bg-slate-950/80 px-6 py-3 border-t border-slate-800 flex items-center gap-2">
+                    <span class="accent-text font-bold">&gt;</span>
+                    <input type="text" id="terminal-input" autocomplete="off" placeholder="Escribe un comando..." class="w-full bg-transparent text-slate-200 outline-none font-mono text-sm">
+                </form>
+            </div>
+        </section>
+
+        <!-- Mini-Game Canvas Widget -->
+        <section id="minigame" class="scroll-mt-28">
+            <div class="glass-panel p-6 rounded-2xl border border-slate-800 text-center space-y-4">
+                <div class="flex justify-between items-center px-2">
+                    <h3 class="text-xl font-bold font-mono accent-text flex items-center gap-2">
+                        <i class="fa-solid fa-gamepad"></i> Space Defense Mini-Game
+                    </h3>
+                    <div class="text-sm font-mono text-slate-400">Score: <span id="game-score" class="text-white font-bold">0</span></div>
+                </div>
+                <div class="relative w-full h-64 bg-slate-950 rounded-xl overflow-hidden border border-slate-800">
+                    <canvas id="game-canvas" class="w-full h-full block"></canvas>
+                    <div id="game-overlay" class="absolute inset-0 bg-slate-950/80 flex flex-col justify-center items-center space-y-3 z-10">
+                        <p class="text-slate-300 font-mono text-sm">¡Destruye los asteroides con clic o toque!</p>
+                        <button onclick="startGame()" class="px-6 py-2 rounded-lg accent-bg text-black font-bold font-mono hover:scale-105 transition-all">
+                            Iniciar Juego
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="scroll-mt-28">
+            <div class="flex items-center gap-4 mb-10">
+                <h2 class="text-3xl font-extrabold tracking-wide"><span class="accent-text font-mono">05.</span> Contacto</h2>
+                <div class="h-[1px] bg-slate-800 flex-1"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold">¿Tienes un proyecto en mente?</h3>
+                    <p class="text-slate-400 leading-relaxed">
+                        Estoy disponible para trabajos freelance, vacantes full-time o simplemente para conectar. ¡Escríbeme y hagamos realidad tu idea!
+                    </p>
+
+                    <div class="space-y-4 font-mono text-sm">
+                        <div class="flex items-center gap-4 p-4 glass-panel rounded-xl">
+                            <i class="fa-solid fa-envelope text-2xl accent-text"></i>
+                            <div>
+                                <div class="text-xs text-slate-400">Email</div>
+                                <div class="font-bold text-white">dev.contact@example.com</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4 p-4 glass-panel rounded-xl">
+                            <i class="fa-solid fa-location-dot text-2xl text-purple-400"></i>
+                            <div>
+                                <div class="text-xs text-slate-400">Ubicación</div>
+                                <div class="font-bold text-white">Remoto / Worldwide</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Icons -->
+                    <div class="flex gap-4 pt-2">
+                        <a href="https://github.com" target="_blank" class="w-12 h-12 glass-panel rounded-xl flex items-center justify-center text-slate-300 hover:text-cyan-400 hover:border-cyan-400 transition-all">
+                            <i class="fa-brands fa-github text-xl"></i>
+                        </a>
+                        <a href="https://linkedin.com" target="_blank" class="w-12 h-12 glass-panel rounded-xl flex items-center justify-center text-slate-300 hover:text-cyan-400 hover:border-cyan-400 transition-all">
+                            <i class="fa-brands fa-linkedin-in text-xl"></i>
+                        </a>
+                        <a href="https://twitter.com" target="_blank" class="w-12 h-12 glass-panel rounded-xl flex items-center justify-center text-slate-300 hover:text-cyan-400 hover:border-cyan-400 transition-all">
+                            <i class="fa-brands fa-x-twitter text-xl"></i>
+                        </a>
+                        <a href="https://discord.com" target="_blank" class="w-12 h-12 glass-panel rounded-xl flex items-center justify-center text-slate-300 hover:text-cyan-400 hover:border-cyan-400 transition-all">
+                            <i class="fa-brands fa-discord text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <form onsubmit="handleFormSubmit(event)" class="glass-panel p-8 rounded-2xl space-y-4">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 mb-2">Nombre</label>
+                        <input type="text" required placeholder="Tu Nombre" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-cyan-400 text-slate-200 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 mb-2">Email</label>
+                        <input type="email" required placeholder="tu@email.com" class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-cyan-400 text-slate-200 transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 mb-2">Mensaje</label>
+                        <textarea rows="4" required placeholder="Cuéntame sobre tu proyecto..." class="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-cyan-400 text-slate-200 transition-colors"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-4 rounded-xl accent-bg text-black font-bold font-mono hover:scale-[1.02] transition-transform">
+                        Enviar Mensaje <i class="fa-solid fa-paper-plane ml-2"></i>
+                    </button>
+                    <div id="form-feedback" class="hidden text-center text-sm font-mono text-emerald-400 pt-2">
+                        ¡Mensaje enviado con éxito! Nos pondremos en contacto pronto.
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-slate-800/80 mt-32 py-8 glass-panel text-center font-mono text-xs text-slate-500">
+        <p>Diseñado & Desarrollado para <span class="accent-text">GitHub Pages</span></p>
+        <p class="mt-1">© 2026 Dev Portfolio. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        /* -------------------------------------------------------------
+         * Theme Customization Logic
+         * ----------------------------------------------------------- */
+        function setTheme(color) {
+            document.documentElement.style.setProperty('--accent-color', color);
+            document.documentElement.style.setProperty('--accent-glow', color + '66');
+        }
+
+        /* -------------------------------------------------------------
+         * Typewriter Effect
+         * ----------------------------------------------------------- */
+        const words = ["Desarrollador Web", "Frontend Enthusiast", "Full-Stack Engineer", "Creative Coder"];
+        let wordIndex = 0, charIndex = 0, isDeleting = false;
+        const typewriterEl = document.getElementById('typewriter');
+
+        function typeEffect() {
+            const currentWord = words[wordIndex];
+            if (isDeleting) {
+                typewriterEl.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterEl.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 50 : 100;
+            if (!isDeleting && charIndex === currentWord.length) {
+                typeSpeed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typeSpeed = 500;
+            }
+            setTimeout(typeEffect, typeSpeed);
+        }
+
+        /* -------------------------------------------------------------
+         * Particle Network Canvas Background
+         * ----------------------------------------------------------- */
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let particles = [];
+        let mouse = { x: null, y: null, radius: 150 };
+
+        function resizeBgCanvas() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+            initParticles();
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * bgCanvas.width;
+                this.y = Math.random() * bgCanvas.height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = Math.random() * 2 + 1;
+            }
+            update() {
+                if (this.x < 0 || this.x > bgCanvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > bgCanvas.height) this.vy *= -1;
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+            draw() {
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                bgCtx.fillStyle = '#1e293b';
+                bgCtx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.floor((bgCanvas.width * bgCanvas.height) / 12000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateBgCanvas() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+
+                // Connect particles near mouse
+                for (let j = index + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 100) {
+                        bgCtx.beginPath();
+                        bgCtx.moveTo(p.x, p.y);
+                        bgCtx.lineTo(p2.x, p2.y);
+                        bgCtx.strokeStyle = `rgba(30, 41, 59, ${1 - dist / 100})`;
+                        bgCtx.lineWidth = 0.5;
+                        bgCtx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animateBgCanvas);
+        }
+
+        /* -------------------------------------------------------------
+         * Interactive CLI Terminal Logic
+         * ----------------------------------------------------------- */
+        const terminalBody = document.getElementById('terminal-body');
+        const terminalForm = document.getElementById('terminal-form');
+        const terminalInput = document.getElementById('terminal-input');
+
+        const commands = {
+            help: "Comandos disponibles: <span class='accent-text'>about</span>, <span class='accent-text'>skills</span>, <span class='accent-text'>projects</span>, <span class='accent-text'>contact</span>, <span class='accent-text'>matrix</span>, <span class='accent-text'>clear</span>",
+            about: "Soy un desarrollador apasionado enfocado en experiencias web interactivas y código limpio.",
+            skills: "Frontend: React, JS/TS, Tailwind. Backend: Node.js, Express, Databases.",
+            projects: "Proyectos activos: Cyber Dashboard, Retro Canvas Shooter, CLI Developer Tool.",
+            contact: "Puedes escribirme a: dev.contact@example.com",
+            matrix: "01000011 01011001 01000010 01000101 01010010 01010000 01010101 01001110 01001011"
+        };
+
+        terminalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const cmd = terminalInput.value.trim().toLowerCase();
+            terminalInput.value = '';
+
+            const line = document.createElement('div');
+            line.innerHTML = `<span class="accent-text">&gt; ${cmd}</span>`;
+            terminalBody.appendChild(line);
+
+            if (cmd === 'clear') {
+                terminalBody.innerHTML = '';
+                return;
+            }
+
+            const response = document.createElement('div');
+            response.className = 'text-slate-400 pl-4';
+            response.innerHTML = commands[cmd] || `Comando no reconocido: '${cmd}'. Escribe <span class='accent-text'>help</span>.`;
+            terminalBody.appendChild(response);
+
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        });
+
+        /* -------------------------------------------------------------
+         * Mini-Game Engine (Canvas Space Shooter)
+         * ----------------------------------------------------------- */
+        const gameCanvas = document.getElementById('game-canvas');
+        const gameCtx = gameCanvas.getContext('2d');
+        let gameScore = 0;
+        let gameActive = false;
+        let targets = [];
+
+        function resizeGameCanvas() {
+            gameCanvas.width = gameCanvas.parentElement.clientWidth;
+            gameCanvas.height = gameCanvas.parentElement.clientHeight;
+        }
+
+        function startGame() {
+            document.getElementById('game-overlay').classList.add('hidden');
+            gameScore = 0;
+            document.getElementById('game-score').textContent = gameScore;
+            gameActive = true;
+            targets = [];
+            spawnTarget();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function spawnTarget() {
+            if (!gameActive) return;
+            targets.push({
+                x: Math.random() * (gameCanvas.width - 40) + 20,
+                y: 0,
+                radius: Math.random() * 15 + 10,
+                speed: Math.random() * 2 + 1
+            });
+            setTimeout(spawnTarget, 800);
+        }
+
+        function gameLoop() {
+            if (!gameActive) return;
+            gameCtx.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            targets.forEach((t, i) => {
+                t.y += t.speed;
+                gameCtx.beginPath();
+                gameCtx.arc(t.x, t.y, t.radius, 0, Math.PI * 2);
+                gameCtx.fillStyle = '#00f3ff';
+                gameCtx.fill();
+
+                if (t.y > gameCanvas.height) {
+                    targets.splice(i, 1);
+                }
+            });
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameCanvas.addEventListener('click', (e) => {
+            if (!gameActive) return;
+            const rect = gameCanvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            targets.forEach((t, i) => {
+                const dist = Math.hypot(clickX - t.x, clickY - t.y);
+                if (dist < t.radius + 10) {
+                    targets.splice(i, 1);
+                    gameScore += 10;
+                    document.getElementById('game-score').textContent = gameScore;
+                }
+            });
+        });
+
+        /* -------------------------------------------------------------
+         * Project Filtering System
+         * ----------------------------------------------------------- */
+        function filterProjects(category) {
+            const cards = document.querySelectorAll('.project-card');
+            const buttons = document.querySelectorAll('.proj-filter');
+
+            buttons.forEach(btn => {
+                btn.classList.remove('border-cyan-400', 'text-cyan-400');
+            });
+
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        /* -------------------------------------------------------------
+         * Mobile Navigation Drawer Toggle
+         * ----------------------------------------------------------- */
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const feedback = document.getElementById('form-feedback');
+            feedback.classList.remove('hidden');
+            e.target.reset();
+            setTimeout(() => feedback.classList.add('hidden'), 5000);
+        }
+
+        /* -------------------------------------------------------------
+         * Initialization on Window Load
+         * ----------------------------------------------------------- */
+        window.onload = function() {
+            typeEffect();
+            resizeBgCanvas();
+            resizeGameCanvas();
+            animateBgCanvas();
+
+            window.addEventListener('resize', () => {
+                resizeBgCanvas();
+                resizeGameCanvas();
+            });
+        };
+    </script>
+</body>
+</html>
