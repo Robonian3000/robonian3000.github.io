@@ -3,5 +3,6 @@ theme: minima
 
 header_pages:
   - index.md
-  - oso ona.html
+  - gallery.md
+
   
